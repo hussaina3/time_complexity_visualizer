@@ -9,6 +9,8 @@ Each algorithm is registered with:
 """
 import time
 
+from data_structures import ArrayQueue, Queue, Stack
+
 
 # ---------------------------------------------------------------- algorithms
 def linear_search(data):
@@ -109,6 +111,51 @@ def constant_access(data):
     return data[0] if data else None
 
 
+# --------------------------------------------------------- stack / queue ops
+def stack_push_pop(data):
+    """Push every item, then pop every item. Stack ops are O(1) each."""
+    s = Stack()
+    for x in data:
+        s.push(x)
+    while not s.is_empty():
+        s.pop()
+
+
+def queue_enqueue_dequeue(data):
+    """Enqueue every item, then dequeue every item, using the deque-backed
+    Queue. Both operations are O(1) each, so this is O(n) overall."""
+    q = Queue()
+    for x in data:
+        q.enqueue(x)
+    while not q.is_empty():
+        q.dequeue()
+
+
+def queue_enqueue_dequeue_array(data):
+    """Same as above, but using the list-backed ArrayQueue. dequeue() is
+    O(n) here (list.pop(0) shifts everything down), so n dequeues cost
+    O(n^2) overall even though enqueue is still O(1)."""
+    q = ArrayQueue()
+    for x in data:
+        q.enqueue(x)
+    while not q.is_empty():
+        q.dequeue()
+
+
+def balanced_brackets(data):
+    """Classic stack application: check that a bracket string is balanced.
+    Each character is pushed or popped at most once, so this is O(n)."""
+    s = Stack()
+    for ch in data:
+        if ch == "(":
+            s.push(ch)
+        else:
+            if s.is_empty():
+                return False
+            s.pop()
+    return s.is_empty()
+
+
 # ------------------------------------------------------------ input builders
 def _ascending(n):
     return list(range(n))
@@ -116,6 +163,12 @@ def _ascending(n):
 
 def _descending(n):
     return list(range(n, 0, -1))  # worst case for the simple sorts
+
+
+def _balanced_bracket_string(n):
+    # n '(' followed by n ')': the stack fills all the way to n before
+    # it ever empties, which is the worst case for this check.
+    return "(" * n + ")" * n
 
 
 ALGORITHMS = {
@@ -137,6 +190,14 @@ ALGORITHMS = {
                          label="Nested loops (2 levels)", big_o="O(n^2)", max_n=5_000),
     "triple_nested_loops": dict(run=triple_nested_loops, prepare=_ascending,
                                 label="Nested loops (3 levels)", big_o="O(n^3)", max_n=300),
+    "stack_push_pop": dict(run=stack_push_pop, prepare=_ascending,
+                           label="Stack push/pop", big_o="O(n)", max_n=1_000_000),
+    "queue_enqueue_dequeue": dict(run=queue_enqueue_dequeue, prepare=_ascending,
+                                  label="Queue enqueue/dequeue (deque)", big_o="O(n)", max_n=1_000_000),
+    "queue_enqueue_dequeue_array": dict(run=queue_enqueue_dequeue_array, prepare=_ascending,
+                                        label="Queue enqueue/dequeue (array-based)", big_o="O(n^2)", max_n=5_000),
+    "balanced_brackets": dict(run=balanced_brackets, prepare=_balanced_bracket_string,
+                              label="Balanced brackets (stack)", big_o="O(n)", max_n=1_000_000),
 }
 
 
